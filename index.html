@@ -1,0 +1,105 @@
+<html>
+<head><title>Drag and Drop</title>
+</head>
+<body>
+<img src="smile.png" id="draggable_object" style="background-color:red;width:50px;position:absolute;left:20px;top:20px;cursor:pointer;z-index:10; ">
+<div id="parent_div" style="background-color:yellow;width:200px;height:200px;position:absolute;left:220px;top:20pxz-index:1;"><img src="face.png" id="droppable_object" style="background-color:green;position:absolute;top:40px;left:20px;""></div>
+<div id=x style="position:absolute;top:250px;font-weight:bold;"></div>
+<div style="position:absolute;top:300px;font-weight:bold;color:green;">
+<h3>Drag The smile :) below the Nose</h3></div>
+</body>
+<script>
+//Set the Default Top and Left Value if the drag isn't on final Co-Ordinate
+var deftop=20,defleft=20;
+//Set the Final Drop Value *Best Position Under Nose*
+var finaltop=270,finalleft=105;
+//Set the area where the image if dragged is considered success for drop
+var mindropx=231,maxdropx=314,mindropy=100,maxdropy=115;
+//Place to display the status
+var msg=document.getElementById('x');
+//Var Create a boundary for the element to be draggable
+var maxboundx=400,minboundx=0,maxboundy=150,minboundy=0;
+//subtract width/2 and height/2 of draggable object to place mouse pointer on center
+var makeXcenter=25,makeYcenter=15;
+
+//function to initialize drag
+function startdrag(event)
+{
+//select element to be dragged
+var ele=document.getElementById('draggable_object');
+//add drag event handler if its not on final position, this prevents dragging of object from final position
+if(ele.style.left!=finalleft && ele.style.top!=finaltop)
+  {
+	//this is draggable event handler
+	ele.addEventListener("mousemove",performdrag,false);
+	//this is droppable event handler
+	ele.addEventListener("mouseup",performdrop,false);
+	}
+//prevent Default action of Drag
+event.preventDefault();
+//prevents parent handlers from being notified of the event
+event.stopPropagation();
+}
+
+//This allows object to be dragged *initiate dragging of object*
+function performdrag(event)
+{
+var e=event.currentTarget;
+//subtract the width and height of draggable object to place mouse pointer on center
+var x=parseInt(event.clientX)-makeXcenter;
+var y=parseInt(event.clientY)-makeYcenter;
+//Set area under which object can be dragged, of mouse pointer exceeds this send to default area with error msg
+if((x<maxboundx && x>minboundx) && (y<maxboundy && y>minboundy))
+	{	
+	e.style.left=x;
+	e.style.top=y;
+	}
+else
+	{
+	e.style.left=defleft;
+	e.style.top=deftop;
+	msg.innerHTML="Hey please don't go out of bounds, Now try again drag face below nose";
+	}
+//prevent Default action of Drag
+event.preventDefault();
+//prevents parent handlers from being notified of the event
+event.stopPropagation();
+}
+
+//function to initiate drop
+function performdrop(event)
+{
+//select the current target
+var e=event.currentTarget;
+//subtract the width and height of draggable object to place mouse pointer on center
+var x=parseInt(event.clientX)-makeXcenter;
+var y=parseInt(event.clientY)-makeYcenter;
+//Specify the final drag position, if not send it to default
+if((x>mindropx && x<maxdropx) && (y>mindropy && y<maxdropy))
+	{
+	e.style.left=finaltop;
+	e.style.top=finalleft;
+	//if dropped on final position remove mousedown event, this prevents image from being dragged from final position
+	ele.removeEventListener("mousedown",startdrag,false);
+	msg.innerHTML="Success";
+	}
+else
+	{
+	e.style.left=defleft;
+	e.style.top=deftop;
+	msg.innerHTML="X-coOrdinate="+x+" " + "Y-coOrdinate="+y;
+	}
+//prevent Default action of Drag
+event.preventDefault();
+//prevents parent handlers from being notified of the event
+event.stopPropagation();
+//Remove Event Handlers
+ele.removeEventListener("mousemove",performdrag,false);
+ele.removeEventListener("mouseup",performdrop,false);
+
+}
+//Initialize Drag on mouse button down
+var ele=document.getElementById('draggable_object');
+ele.addEventListener("mousedown",startdrag,false);
+</script>
+</html>
